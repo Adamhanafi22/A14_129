@@ -15,7 +15,7 @@ interface AppContainer {
     val pelangganRepository: PelangganRepository
 }
 
-class AppContainerImpl : AppContainer {
+class VillaContainer : AppContainer {
     private val baseUrl = "http://10.0.2.2:3000/api/"
     private val json = Json { ignoreUnknownKeys = true }
 
