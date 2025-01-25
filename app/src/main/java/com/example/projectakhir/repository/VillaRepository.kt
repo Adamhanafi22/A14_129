@@ -8,7 +8,7 @@ import java.io.IOException
 
 interface VillaRepository {
 
-    suspend fun getAllVillas(): AllVillaResponse
+    suspend fun getAllVilla(): AllVillaResponse
 
     suspend fun insertVilla(villa: Villa)
 
@@ -24,8 +24,8 @@ class NetworkVillaRepository(
 ) : VillaRepository {
 
     // Mengambil daftar semua villa
-    override suspend fun getAllVillas(): AllVillaResponse =
-        villaApiService.getAllVillas()
+    override suspend fun getAllVilla(): AllVillaResponse =
+        villaApiService.getAllVilla()
 
     // Menambahkan villa baru
     override suspend fun insertVilla(villa: Villa) {
