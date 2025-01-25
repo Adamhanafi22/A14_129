@@ -12,7 +12,7 @@ data class Pelanggan(
 
     val nama_pelanggan: String,
 
-    val no_hp: Int
+    val no_hp: String
 )
 
 @Serializable

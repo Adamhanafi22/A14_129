@@ -16,7 +16,7 @@ data class Villa(
 
     val alamat: String,
 
-    val kamar_Tersedia: Int
+    val kamar_tersedia: Int = 0,
 )
 
 @Serializable
