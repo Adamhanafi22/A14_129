@@ -21,15 +21,15 @@ interface VillaService {
     )
 
     // Menambahkan villa baru
-    @POST("store")
+    @POST("villa/store")
     suspend fun insertVilla(@Body villa: Villa)
 
     // Mengambil semua villa
-    @GET(".")
-    suspend fun getAllVillas(): AllVillaResponse
+    @GET("villa/")
+    suspend fun getAllVilla(): AllVillaResponse
 
     // Mengambil detail villa berdasarkan id
-    @GET("{id_villa}")
+    @GET("villa/{id_villa}")
     suspend fun getVillaById(@Path("id_villa") id_villa: Int): VillaDetailResponse
 
     // Memperbarui data villa berdasarkan id_villa
@@ -37,9 +37,9 @@ interface VillaService {
     suspend fun updateVilla(
         @Path("id_villa") id_villa: Int,
         @Body villa: Villa
-    ): Response<Void>
+    ): Response<Villa>
 
     // Menghapus villa berdasarkan id_villa
-    @DELETE("{id_villa}")
+    @DELETE("villa/{id_villa}")
     suspend fun deleteVilla(@Path("id_villa") id_villa: Int): Response<Void>
 }

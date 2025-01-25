@@ -20,26 +20,21 @@ interface ReservasiService {
         "Content-Type: application/json"
     )
 
-    // Menambahkan reservasi baru
-    @POST("store")
+    @POST("reservasi/store")
     suspend fun insertReservasi(@Body reservasi: Reservasi)
 
-    // Mengambil semua reservasi
-    @GET(".")
+    @GET("reservasi")
     suspend fun getAllReservasi(): AllReservasiResponse
 
-    // Mengambil detail reservasi berdasarkan id
-    @GET("{id_reservasi}")
+    @GET("reservasi/{id_reservasi}")
     suspend fun getReservasiById(@Path("id_reservasi") id_reservasi: Int): ReservasiDetailResponse
 
-    // Memperbarui data reservasi berdasarkan id_reservasi
-    @PUT("{id_reservasi}")
+    @PUT("reservasi/{id_reservasi}")
     suspend fun updateReservasi(
         @Path("id_reservasi") id_reservasi: Int,
         @Body reservasi: Reservasi
     ): Response<Void>
 
-    // Menghapus reservasi berdasarkan id_reservasi
-    @DELETE("{id_reservasi}")
+    @DELETE("reservasi/{id_reservasi}")
     suspend fun deleteReservasi(@Path("id_reservasi") id_reservasi: Int): Response<Void>
 }
