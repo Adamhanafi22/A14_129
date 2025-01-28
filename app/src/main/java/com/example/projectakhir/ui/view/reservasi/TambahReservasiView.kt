@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.projectakhir.model.Pelanggan
+import com.example.projectakhir.model.Villa
 import com.example.projectakhir.navigation.DestinasiNavigasi
 import com.example.projectakhir.ui.customwidget.TopAppBarr
 import com.example.projectakhir.ui.viewmodel.PenyediaViewModel
@@ -105,34 +106,78 @@ fun FormReservasiInput(
     reservasiUiEvent: ReservasiUiEvent,
     onValueChange: (ReservasiUiEvent) -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    viewModel: InsertReservasiViewModel = viewModel()
 ) {
+    // Mengambil data pelanggan dan villa dari ViewModel
+    val pelangganList by viewModel.pelangganList.collectAsState()
+    val villaList by viewModel.villaList.collectAsState()
+
     val dateFormatter = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
     var showDatePicker by remember { mutableStateOf(false) }
     var datePickerType by remember { mutableStateOf("") } // "check_in" atau "check_out"
-    var expanded by remember { mutableStateOf(false) }
-    var selectedPelanggan by remember { mutableStateOf<Pelanggan?>(null) }
+    var expandedPelanggan by remember { mutableStateOf(false) }
+    var expandedVilla by remember { mutableStateOf(false) }
 
-    // List pelanggan diambil dari ViewModel atau parameter
-    val pelangganList = listOf<Pelanggan>() // Gantilah dengan data yang sesuai
+    var selectedPelanggan by remember { mutableStateOf<Pelanggan?>(null) }
+    var selectedVilla by remember { mutableStateOf<Villa?>(null) }
+
+    // Pastikan pelangganList dan villaList diambil dengan benar
+//    LaunchedEffect(Unit) {
+//        viewModel.fetchPelanggan() // Ambil data pelanggan
+//        viewModel.fetchVilla() // Ambil data villa
+//    }
 
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        OutlinedTextField(
-            value = reservasiUiEvent.id_villa.toString(),
-            onValueChange = { onValueChange(reservasiUiEvent.copy(id_villa = it.toIntOrNull() ?: 0)) },
-            label = { Text("ID Villa") },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = enabled,
-            singleLine = true
-        )
-
-        // Perbaiki dropdown tanpa mengubah fungsionalitas fokus
+        // ID Villa Dropdown
         ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = it }
+            expanded = expandedVilla,
+            onExpandedChange = { expandedVilla = it }
+        ) {
+            OutlinedTextField(
+                value = selectedVilla?.namaVilla ?: "Pilih Villa",
+                onValueChange = {},
+                label = { Text("Nama Villa") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(),
+                enabled = enabled,
+                readOnly = true, // Mencegah keyboard muncul saat diklik
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedVilla)
+                }
+            )
+            ExposedDropdownMenu(
+                expanded = expandedVilla,
+                onDismissRequest = { expandedVilla = false }
+            ) {
+                if (villaList.isEmpty()) {
+                    DropdownMenuItem(
+                        text = { Text("Tidak ada villa") },
+                        onClick = { expandedVilla = false }
+                    )
+                } else {
+                    villaList.forEach { villa ->
+                        DropdownMenuItem(
+                            text = { Text(villa.namaVilla) },
+                            onClick = {
+                                selectedVilla = villa
+                                onValueChange(reservasiUiEvent.copy(id_villa = villa.idVilla))
+                                expandedVilla = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
+        // Nama Pelanggan Dropdown
+        ExposedDropdownMenuBox(
+            expanded = expandedPelanggan,
+            onExpandedChange = { expandedPelanggan = it }
         ) {
             OutlinedTextField(
                 value = selectedPelanggan?.nama_pelanggan ?: "Pilih Pelanggan",
@@ -140,52 +185,62 @@ fun FormReservasiInput(
                 label = { Text("Nama Pelanggan") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { expanded = true },  // Klik untuk membuka dropdown
-                enabled = false,
-                singleLine = true,
+                    .menuAnchor(),
+                enabled = enabled,
+                readOnly = true, // Mencegah keyboard muncul saat diklik
                 trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedPelanggan)
                 }
             )
             ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
+                expanded = expandedPelanggan,
+                onDismissRequest = { expandedPelanggan = false }
             ) {
-                pelangganList.forEach { pelanggan ->
+                if (pelangganList.isEmpty()) {
                     DropdownMenuItem(
-                        text = { Text(pelanggan.nama_pelanggan) },
-                        onClick = {
-                            selectedPelanggan = pelanggan
-                            onValueChange(reservasiUiEvent.copy(id_pelanggan = pelanggan.id_pelanggan))
-                            expanded = false
-                        }
+                        text = { Text("Tidak ada pelanggan") },
+                        onClick = { expandedPelanggan = false }
                     )
+                } else {
+                    pelangganList.forEach { pelanggan ->
+                        DropdownMenuItem(
+                            text = { Text(pelanggan.nama_pelanggan) },
+                            onClick = {
+                                selectedPelanggan = pelanggan
+                                onValueChange(reservasiUiEvent.copy(id_pelanggan = pelanggan.id_pelanggan))
+                                expandedPelanggan = false
+                            }
+                        )
+                    }
                 }
             }
         }
 
+        // OutlinedTextField untuk Check-in dan Check-out
         OutlinedTextField(
             value = dateFormatter.format(reservasiUiEvent.check_in),
             onValueChange = {},
             label = { Text("Check-in Date") },
-            modifier = Modifier.fillMaxWidth().clickable {
-                datePickerType = "check_in"
-                showDatePicker = true
-            },
-            enabled = false,
-            singleLine = true
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    datePickerType = "check_in"
+                    showDatePicker = true
+                },
+
         )
 
         OutlinedTextField(
             value = dateFormatter.format(reservasiUiEvent.check_out),
             onValueChange = {},
             label = { Text("Check-out Date") },
-            modifier = Modifier.fillMaxWidth().clickable {
-                datePickerType = "check_out"
-                showDatePicker = true
-            },
-            enabled = false,
-            singleLine = true
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    datePickerType = "check_out"
+                    showDatePicker = true
+                },
+
         )
 
         OutlinedTextField(

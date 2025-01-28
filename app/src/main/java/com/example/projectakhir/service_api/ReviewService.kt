@@ -25,7 +25,7 @@ interface ReviewService {
     suspend fun insertReview(@Body review: Review)
 
     // Mengambil semua review
-    @GET(".")
+    @GET("review/")
     suspend fun getAllReviews(): AllReviewResponse
 
     // Mengambil detail review berdasarkan id

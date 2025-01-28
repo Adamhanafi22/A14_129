@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,8 +20,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.projectakhir.R
 import com.example.projectakhir.model.Pelanggan
 import com.example.projectakhir.navigation.DestinasiNavigasi
+import com.example.projectakhir.ui.customwidget.CustomBottomAppBar
 import com.example.projectakhir.ui.viewmodel.PenyediaViewModel
-import com.example.projectakhir.ui.viewmodel.home.HomeViewModel
 import com.example.projectakhir.ui.viewmodel.pelanggan.PelangganUiState
 import com.example.projectakhir.ui.viewmodel.pelanggan.PelangganViewModel
 
@@ -33,8 +34,13 @@ object DestinasiDaftarPelangan: DestinasiNavigasi {
 @Composable
 fun DaftarPelangganScreen(
     navigateToItemEntry: () -> Unit,
+    navigateToHome: () -> Unit,
+    navigateToReview: () -> Unit,
+    navigateToPelanggan: () -> Unit,
+    navigateToReservasi: () -> Unit,
+    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onDetailClick: (Int) -> Unit = {},
+    onUpdateClick: (Pelanggan) -> Unit, // Menambahkan parameter onUpdateClick
     viewModel: PelangganViewModel = viewModel(factory = PenyediaViewModel.Factory)
 ) {
     Scaffold(
@@ -56,17 +62,26 @@ fun DaftarPelangganScreen(
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Tambah Pelanggan")
             }
+        },
+        bottomBar = {
+            CustomBottomAppBar(
+                onHomeClick = navigateToHome,
+                onPelangganClick = navigateToPelanggan,
+                onReservasiClick = navigateToReservasi,
+                onReviewClick = navigateToReview,
+                onBackClick = onBackClick
+            )
         }
     ) { innerPadding ->
         PelangganStatus(
             pelangganUiState = viewModel.pelangganUiState,
             retryAction = { viewModel.getAllPelanggan() },
             modifier = Modifier.padding(innerPadding),
-            onDetailClick = onDetailClick,
             onDeleteClick = {
                 viewModel.deletePelanggan(it.id_pelanggan)
                 viewModel.getAllPelanggan()
-            }
+            },
+            onUpdateClick = onUpdateClick // Meneruskan onUpdateClick ke PelangganStatus
         )
     }
 }
@@ -77,11 +92,11 @@ fun PelangganStatus(
     retryAction: () -> Unit,
     modifier: Modifier = Modifier,
     onDeleteClick: (Pelanggan) -> Unit = {},
-    onDetailClick: (Int) -> Unit
+    onUpdateClick: (Pelanggan) -> Unit // Menambahkan onUpdateClick
 ) {
     when (pelangganUiState) {
         is PelangganUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
-        is PelangganUiState.Success ->
+        is PelangganUiState.Success -> {
             if (pelangganUiState.pelanggan.isEmpty()) {
                 Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(text = "Tidak ada data Pelanggan")
@@ -90,10 +105,12 @@ fun PelangganStatus(
                 PelangganList(
                     pelanggan = pelangganUiState.pelanggan,
                     modifier = modifier.fillMaxWidth(),
-                    onDetailClick = { onDetailClick(it.id_pelanggan) },
-                    onDeleteClick = { onDeleteClick(it) }
+                    onDetailClick = { /* handle detail click */ },
+                    onDeleteClick = { onDeleteClick(it) },
+                    onUpdateClick = onUpdateClick // Meneruskan onUpdateClick ke PelangganList
                 )
             }
+        }
         is PelangganUiState.Error -> ErrorScreen(retryAction, modifier = modifier.fillMaxSize())
     }
 }
@@ -103,7 +120,8 @@ fun PelangganList(
     pelanggan: List<Pelanggan>,
     modifier: Modifier = Modifier,
     onDetailClick: (Pelanggan) -> Unit,
-    onDeleteClick: (Pelanggan) -> Unit = {}
+    onDeleteClick: (Pelanggan) -> Unit = {},
+    onUpdateClick: (Pelanggan) -> Unit // Menambahkan onUpdateClick
 ) {
     LazyColumn(
         modifier = modifier,
@@ -116,7 +134,8 @@ fun PelangganList(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onDetailClick(pelanggan) },
-                onDeleteClick = { onDeleteClick(pelanggan) }
+                onDeleteClick = { onDeleteClick(pelanggan) },
+                onUpdateClick = { onUpdateClick(pelanggan) } // Meneruskan onUpdateClick ke PelangganCard
             )
         }
     }
@@ -126,7 +145,8 @@ fun PelangganList(
 fun PelangganCard(
     pelanggan: Pelanggan,
     modifier: Modifier = Modifier,
-    onDeleteClick: (Pelanggan) -> Unit = {}
+    onDeleteClick: (Pelanggan) -> Unit = {},
+    onUpdateClick: (Pelanggan) -> Unit = {} // Menambahkan onUpdateClick
 ) {
     Card(
         modifier = modifier,
@@ -146,6 +166,12 @@ fun PelangganCard(
                     style = MaterialTheme.typography.titleLarge
                 )
                 Spacer(Modifier.weight(1f))
+                IconButton(onClick = { onUpdateClick(pelanggan) }) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Update Pelanggan"
+                    )
+                }
                 IconButton(onClick = { onDeleteClick(pelanggan) }) {
                     Icon(
                         imageVector = Icons.Default.Delete,

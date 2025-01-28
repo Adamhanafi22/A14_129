@@ -21,6 +21,7 @@ import com.example.projectakhir.navigation.DestinasiNavigasi
 import com.example.projectakhir.ui.viewmodel.reservasi.ReservasiUiState
 import com.example.projectakhir.ui.viewmodel.reservasi.ReservasiViewModel
 import com.example.projectakhir.R
+import com.example.projectakhir.ui.customwidget.CustomBottomAppBar
 import com.example.projectakhir.ui.viewmodel.PenyediaViewModel
 
 object DestinasiDaftarReservasi : DestinasiNavigasi {
@@ -34,6 +35,11 @@ fun DaftarReservasiScreen(
     navigateToItemEntry: () -> Unit,
     modifier: Modifier = Modifier,
     onDetailClick: (Int) -> Unit = {},
+    navigateToHome: () -> Unit = {},
+    navigateToReview: () -> Unit = {},
+    navigateToReservasi: () -> Unit = {},
+    navigateToPelanggan: () -> Unit = {},
+    onBackClick: () -> Unit = {},
     viewModel: ReservasiViewModel = viewModel(factory = PenyediaViewModel.Factory)
 ) {
     Scaffold(
@@ -55,6 +61,15 @@ fun DaftarReservasiScreen(
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Tambah Reservasi")
             }
+        },
+        bottomBar = {
+            CustomBottomAppBar(
+                onHomeClick = navigateToHome,
+                onReviewClick = navigateToReview,
+                onReservasiClick = navigateToReservasi,
+                onPelangganClick = navigateToPelanggan,
+                onBackClick = onBackClick
+            )
         }
     ) { innerPadding ->
         ReservasiStatus(

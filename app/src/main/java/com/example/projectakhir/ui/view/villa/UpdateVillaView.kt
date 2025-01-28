@@ -37,7 +37,7 @@ fun UpdateView(
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
-    // Collect the UI state from the ViewModel
+
     val uiState = viewModel.uiState.value
 
     Scaffold(

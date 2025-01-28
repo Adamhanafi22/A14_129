@@ -1,18 +1,24 @@
 package com.example.projectakhir.ui.view.villa
 
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.projectakhir.R
 import com.example.projectakhir.model.Villa
 import com.example.projectakhir.navigation.DestinasiNavigasi
 import com.example.projectakhir.ui.customwidget.TopAppBarr
@@ -36,7 +42,8 @@ fun DetailVillaScreen(
     modifier: Modifier = Modifier,
     viewModel: DetailVillaViewModel = viewModel(factory = PenyediaViewModel.Factory),
     onEditClick: (String) -> Unit = {},
-    navigateBack: () -> Unit
+    navigateBack: () -> Unit,
+    onReservasiClick: (String) -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -65,7 +72,8 @@ fun DetailVillaScreen(
         BodyDetailVilla(
             modifier = Modifier.padding(innerPadding),
             detailVillaUiState = detailVillaUiState,
-            retryAction = { viewModel.getDetailVilla() }
+            retryAction = { viewModel.getDetailVilla() },
+            onReservasiClick = onReservasiClick
         )
     }
 }
@@ -74,7 +82,8 @@ fun DetailVillaScreen(
 fun BodyDetailVilla(
     modifier: Modifier = Modifier,
     detailVillaUiState: DetailVillaUiState,
-    retryAction: () -> Unit = {}
+    retryAction: () -> Unit = {},
+    onReservasiClick: (String) -> Unit = {}
 ) {
     when (detailVillaUiState) {
         is DetailVillaUiState.Loading -> {
@@ -86,7 +95,7 @@ fun BodyDetailVilla(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                ItemDetailVilla(villa = detailVillaUiState.villa)
+                ItemDetailVilla(villa = detailVillaUiState.villa, onReservasiClick = onReservasiClick)
             }
         }
         is DetailVillaUiState.Error -> {
@@ -104,7 +113,8 @@ fun BodyDetailVilla(
 @Composable
 fun ItemDetailVilla(
     modifier: Modifier = Modifier,
-    villa: Villa
+    villa: Villa,
+    onReservasiClick: (String) -> Unit = {}
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -116,6 +126,15 @@ fun ItemDetailVilla(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
+            Image(
+                painter = painterResource(R.drawable.villa), // Gambar dari drawable
+                contentDescription = "Villa Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp)
+                    .clip(RoundedCornerShape(12.dp))
+            )
             ComponentDetailVilla(judul = "ID Villa", isinya = villa.idVilla.toString())
             Spacer(modifier = Modifier.padding(4.dp))
 
@@ -127,6 +146,13 @@ fun ItemDetailVilla(
 
             ComponentDetailVilla(judul = "Kamar Tersedia", isinya = villa.kamar_tersedia.toString())
             Spacer(modifier = Modifier.padding(4.dp))
+
+            Button(
+                onClick = { onReservasiClick(villa.idVilla.toString()) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Reservasi")
+            }
         }
     }
 }
@@ -153,4 +179,5 @@ fun ComponentDetailVilla(
         )
     }
 }
+
 

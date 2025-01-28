@@ -11,7 +11,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.projectakhir.navigation.PengelolaHalaman
 import com.example.projectakhir.ui.theme.ProjectAkhirTheme
+import com.example.projectakhir.ui.view.review.DaftarReviewScreen
+
+
+import com.example.projectakhir.ui.view.villa.EntryVillaScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,8 +25,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             ProjectAkhirTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
+                    PengelolaHalaman(
+                        //navigateToItemEntry = {},
+
                         modifier = Modifier.padding(innerPadding)
                     )
                 }

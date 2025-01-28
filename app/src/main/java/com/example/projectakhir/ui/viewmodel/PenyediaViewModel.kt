@@ -12,27 +12,42 @@ import com.example.projectakhir.VillaApplications
 import com.example.projectakhir.ui.viewmodel.home.HomeViewModel
 import com.example.projectakhir.ui.viewmodel.pelanggan.InsertPelangganViewModel
 import com.example.projectakhir.ui.viewmodel.pelanggan.PelangganViewModel
+import com.example.projectakhir.ui.viewmodel.pelanggan.UpdatePelangganViewModel
+import com.example.projectakhir.ui.viewmodel.reservasi.DetailReservasiViewModell
 import com.example.projectakhir.ui.viewmodel.reservasi.InsertReservasiViewModel
 import com.example.projectakhir.ui.viewmodel.reservasi.ReservasiViewModel
+import com.example.projectakhir.ui.viewmodel.review.ReviewViewModel
 import com.example.projectakhir.ui.viewmodel.villa.DetailVillaViewModel
 import com.example.projectakhir.ui.viewmodel.villa.UpdateVillaViewModel
 
 
-object PenyediaViewModel{
+object PenyediaViewModel {
     val Factory = viewModelFactory {
         // Villa
         initializer { HomeViewModel(aplikasiVilla().container.villaRepository) }
         initializer { InsertVillaViewModel(aplikasiVilla().container.villaRepository) }
-        initializer { DetailVillaViewModel(createSavedStateHandle(),aplikasiVilla().container.villaRepository) }
-        initializer {UpdateVillaViewModel(createSavedStateHandle(),aplikasiVilla().container.villaRepository) }
+        initializer {
+            DetailVillaViewModel(
+                createSavedStateHandle(),
+                aplikasiVilla().container.villaRepository
+            )
+        }
+        initializer {
+            UpdateVillaViewModel(
+                createSavedStateHandle(),
+                aplikasiVilla().container.villaRepository
+            )
+        }
 
 
         // Pelangan
         initializer { PelangganViewModel(aplikasiVilla().container.pelangganRepository) }
         initializer { InsertPelangganViewModel(aplikasiVilla().container.pelangganRepository) }
+        initializer { UpdatePelangganViewModel(createSavedStateHandle(), aplikasiVilla().container.pelangganRepository)
+        }
 
 
-        //Reservasi
+
         // Reservasi
         initializer {
             InsertReservasiViewModel(
@@ -42,9 +57,15 @@ object PenyediaViewModel{
             )
         }
         initializer { ReservasiViewModel(aplikasiVilla().container.reservasiRepository) }
-    }
+        initializer { DetailReservasiViewModell(createSavedStateHandle(),aplikasiVilla().container.reservasiRepository) }
+
+        //Review
+        initializer { ReviewViewModel(aplikasiVilla().container.reviewRepository) }
 
     }
+
+
+}
 
 fun CreationExtras.aplikasiVilla():VillaApplications =
     (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]as VillaApplications)
